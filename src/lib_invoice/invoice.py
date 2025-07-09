@@ -1,9 +1,4 @@
-import re
-import chardet
-from bs4 import BeautifulSoup
 from datetime import datetime
-from email import message_from_string
-from email.header import decode_header
 from lib_utilys import clean_special_characters, read_json
 
 class Invoice:
