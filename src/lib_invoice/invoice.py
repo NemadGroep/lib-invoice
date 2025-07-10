@@ -36,15 +36,12 @@ class Invoice:
             self.type = 'INVO'
             self.kvpairs['Type'] = 'INVO'
 
-    def additional_kv_pairs(self, crit_path: Path, debmap_pth: Path, ctryabbr_path: Path, taxmap_path: Path, EUabbr_path: Path):
+    def additional_kv_pairs(self,debmap_pth: Path, ctryabbr_path: Path, taxmap_path: Path, EUabbr_path: Path):
         """Adds additional key-value pairs to the invoice."""
-        logger.debug("Received the following parameters: \n %s \n %s \n %s \n %s \n %s", crit_path, debmap_pth, ctryabbr_path, taxmap_path, EUabbr_path)
         self.kvpairs['Creation_date'] = datetime.now().strftime('%Y%m%d')
         self.kvpairs['Creation_time'] = datetime.now().strftime('%H%M%S')
         self.kvpairs['Timestamp'] = datetime.now().strftime('%Y%m%d%H%M%S')
-        logger.debug(read_json(crit_path))
-        logger.debug(self.kvpairs["Debtor_name"])
-        self.kvpairs['Debtor_code'] = (read_json(crit_path)).get(self.kvpairs['Debtor_name'], {}).get('debtor_code')
+        self.kvpairs['Debtor_code'] = (read_json(debmap_pth)).get(self.kvpairs['Debtor_name'], {}).get('debtor_code')
         if self.kvpairs['Debtor_code'] is None: raise MissingValueError("Debtor code is None")
         self.kvpairs['Debtor_international_location_number'] = (read_json(debmap_pth)).get(self.kvpairs['Debtor_name'], {}).get('illnr')
         self.kvpairs['Partner_country'] = (read_json(ctryabbr_path)).get(self.kvpairs['Partner_country'])
