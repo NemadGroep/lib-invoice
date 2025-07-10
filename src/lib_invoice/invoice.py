@@ -1,5 +1,9 @@
+import logging
+from pathlib import Path
 from datetime import datetime
 from lib_utilys import clean_special_characters, read_json
+
+logger = logging.getLogger(__name__)
 
 class Invoice:
     def __init__(self, uid: str, adress: str, message: str, business: str, subject: str, text: str, pdf: bytes):
@@ -32,11 +36,14 @@ class Invoice:
             self.type = 'INVO'
             self.kvpairs['Type'] = 'INVO'
 
-    def additional_kv_pairs(self, crit_path: str, debmap_pth: str, ctryabbr_path: str):
+    def additional_kv_pairs(self, crit_path: Path, debmap_pth: Path, ctryabbr_path: Path, taxmap_path: Path, EUabbr_path: Path):
         """Adds additional key-value pairs to the invoice."""
+        logger.debug("Received the following parameters: \n %s \n %s \n %s \n %s \n %s", crit_path, debmap_pth, ctryabbr_path, taxmap_path, EUabbr_path)
         self.kvpairs['Creation_date'] = datetime.now().strftime('%Y%m%d')
         self.kvpairs['Creation_time'] = datetime.now().strftime('%H%M%S')
         self.kvpairs['Timestamp'] = datetime.now().strftime('%Y%m%d%H%M%S')
+        logger.debug(read_json(crit_path))
+        logger.debug(self.kvpairs["Debtor_name"])
         self.kvpairs['Debtor_code'] = (read_json(crit_path)).get(self.kvpairs['Debtor_name'], {}).get('debtor_code')
         if self.kvpairs['Debtor_code'] is None: raise MissingValueError("Debtor code is None")
         self.kvpairs['Debtor_international_location_number'] = (read_json(debmap_pth)).get(self.kvpairs['Debtor_name'], {}).get('illnr')
@@ -47,7 +54,7 @@ class Invoice:
         if 'Debtor_number' in self.kvpairs and self.kvpairs['Debtor_number'] is not None: self.kvpairs['Debtor_number'] = clean_special_characters(self.kvpairs['Debtor_number'])
         self.pdf_filename = f"{self.kvpairs['Creditor_number']}-{self.kvpairs['Debtor_international_location_number']}.{self.kvpairs['Invoice_number']}.pdf"
         self.pdf_filename = clean_special_characters(self.pdf_filename)
-        self.configure_tax_()
+        self.configure_tax_(EUabbr_path, taxmap_path)
 
     def set_line_level_(self):
         """Sets certain key-value pairs to line level in Material_list."""
@@ -74,7 +81,7 @@ class Invoice:
         except Exception as e:
             self.Output.output(f"Error configuring CRME: {e}")
 
-    def configure_tax_(self, EUabbr_path: str, taxmap_path: str):
+    def configure_tax_(self, EUabbr_path: Path, taxmap_path: Path):
         """Configures the tax for the invoice."""
         eu_countries = (read_json(EUabbr_path)).get('EU_country_abbreviations', [])
         if self.kvpairs['Partner_country'] == 'NL':
