@@ -81,19 +81,13 @@ class Invoice:
     def configure_tax_(self, EUabbr_path: Path, taxmap_path: Path):
         """Configures the tax for the invoice."""
         eu_countries = (read_json(EUabbr_path)).get('EU_country_abbreviations', [])
-        logger.debug(f"self.kvpairs['Partner_country'] is {self.kvpairs['Partner_country']}")
-        logger.debug(f"self.kvpairs['Tax_percent'] is {self.kvpairs['Tax_percent']}")
-        logger.debug(f"taxmap: {read_json(taxmap_path)}")
         if self.kvpairs['Partner_country'] == 'NL':
-            logger.debug(f" taxmapNL: {read_json(taxmap_path).get('NL')}")
             self.kvpairs['Tax_qualifier'] = (read_json(taxmap_path)).get('NL', {}).get(str(int(self.kvpairs['Tax_percent'] if self.kvpairs['Tax_percent'] is not None else 0)))
             if self.kvpairs['Tax_qualifier'] is None: raise MissingValueError("Tax qualifier is None")
         elif self.kvpairs['Partner_country'] in eu_countries:
-            logger.debug(f" taxmapEU: {read_json(taxmap_path).get('EU')}")
             self.kvpairs['Tax_qualifier'] = (read_json(taxmap_path)).get('EU', {}).get(str(int(self.kvpairs['Tax_percent'] if self.kvpairs['Tax_percent'] is not None else 0)))
             if self.kvpairs['Tax_qualifier'] is None: raise MissingValueError("Tax qualifier is None")
         else:
-            logger.debug(f" taxmapNonEU: {read_json(taxmap_path).get('Non-EU')}")
             self.kvpairs['Tax_qualifier'] = (read_json(taxmap_path)).get('Non-EU', {}).get(str(int(self.kvpairs['Tax_percent'] if self.kvpairs['Tax_percent'] is not None else 0)))
             if self.kvpairs['Tax_qualifier'] is None: raise MissingValueError("Tax qualifier is None")
 
