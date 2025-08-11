@@ -81,14 +81,17 @@ class Invoice:
     def configure_tax_(self, EUabbr_path: Path, taxmap_path: Path):
         """Configures the tax for the invoice."""
         eu_countries = (read_json(EUabbr_path)).get('EU_country_abbreviations', [])
+        tax_percent = self.kvpairs.get('Tax_percent', None)
+        if tax_percent is None:
+            tax_percent = round(self.kvpairs.get('Invoice_value') / self.kvpairs.get('Net_value', 1) - 1, 2) * 100
         if self.kvpairs['Partner_country'] == 'NL':
-            self.kvpairs['Tax_qualifier'] = (read_json(taxmap_path)).get('NL', {}).get(str(int(self.kvpairs['Tax_percent'] if self.kvpairs['Tax_percent'] is not None else 0)))
+            self.kvpairs['Tax_qualifier'] = (read_json(taxmap_path)).get('NL', {}).get(str(int(tax_percent)))
             if self.kvpairs['Tax_qualifier'] is None: raise MissingValueError("Tax qualifier is None")
         elif self.kvpairs['Partner_country'] in eu_countries:
-            self.kvpairs['Tax_qualifier'] = (read_json(taxmap_path)).get('EU', {}).get(str(int(self.kvpairs['Tax_percent'] if self.kvpairs['Tax_percent'] is not None else 0)))
+            self.kvpairs['Tax_qualifier'] = (read_json(taxmap_path)).get('EU', {}).get(str(int(tax_percent)))
             if self.kvpairs['Tax_qualifier'] is None: raise MissingValueError("Tax qualifier is None")
         else:
-            self.kvpairs['Tax_qualifier'] = (read_json(taxmap_path)).get('Non-EU', {}).get(str(int(self.kvpairs['Tax_percent'] if self.kvpairs['Tax_percent'] is not None else 0)))
+            self.kvpairs['Tax_qualifier'] = (read_json(taxmap_path)).get('Non-EU', {}).get(str(int(tax_percent)))
             if self.kvpairs['Tax_qualifier'] is None: raise MissingValueError("Tax qualifier is None")
 
 class MissingValueError(Exception):
