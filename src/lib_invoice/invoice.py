@@ -86,8 +86,10 @@ class Invoice:
             # Assumption that if no tax percent is given and no total tax is given, the tax percent is 0
             if self.kvpairs.get('Total_tax', None) is None:
                 tax_percent = 0
+                self.kvpairs['Tax_percent'] = tax_percent
             else:
                 tax_percent = round(self.kvpairs.get('Invoice_value') / self.kvpairs.get('Net_value', 1) - 1, 2) * 100
+                self.kvpairs['Tax_percent'] = tax_percent
         if self.kvpairs['Partner_country'] == 'NL':
             self.kvpairs['Tax_qualifier'] = (read_json(taxmap_path)).get('NL', {}).get(str(int(tax_percent)))
             if self.kvpairs['Tax_qualifier'] is None: raise MissingValueError("Tax qualifier is None")

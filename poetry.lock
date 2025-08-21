@@ -2,14 +2,14 @@
 
 [[package]]
 name = "lib-utilys"
-version = "0.1.3"
+version = "0.1.7"
 description = ""
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "lib_utilys-0.1.3-py3-none-any.whl", hash = "sha256:80e2d5c3893e80c35aa0922cacb30def9f1adaeb113e5aaad925e25532af83a7"},
-    {file = "lib_utilys-0.1.3.tar.gz", hash = "sha256:be175943eea032c44398556a57bfbda5916ec3188b45ba4c1f48ac7a46501b85"},
+    {file = "lib_utilys-0.1.7-py3-none-any.whl", hash = "sha256:4f175233db2a6f143d33fb23f58d2fa63697dcfc6bbfa5869d83e596fee81dfb"},
+    {file = "lib_utilys-0.1.7.tar.gz", hash = "sha256:e6aa140acb5f7c908534d438ef70744bb42ea81da2394d56e349f02690ddf746"},
 ]
 
 [metadata]
