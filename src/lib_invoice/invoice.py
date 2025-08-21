@@ -83,7 +83,11 @@ class Invoice:
         eu_countries = (read_json(EUabbr_path)).get('EU_country_abbreviations', [])
         tax_percent = self.kvpairs.get('Tax_percent', None)
         if tax_percent is None:
-            tax_percent = round(self.kvpairs.get('Invoice_value') / self.kvpairs.get('Net_value', 1) - 1, 2) * 100
+            # Assumption that if no tax percent is given and no net value is given, the tax percent is 0
+            if self.kvpairs.get('Net_value', None) is None:
+                tax_percent = 0
+            else:
+                tax_percent = round(self.kvpairs.get('Invoice_value') / self.kvpairs.get('Net_value', 1) - 1, 2) * 100
         if self.kvpairs['Partner_country'] == 'NL':
             self.kvpairs['Tax_qualifier'] = (read_json(taxmap_path)).get('NL', {}).get(str(int(tax_percent)))
             if self.kvpairs['Tax_qualifier'] is None: raise MissingValueError("Tax qualifier is None")
