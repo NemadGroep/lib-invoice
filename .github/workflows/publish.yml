@@ -9,18 +9,27 @@
 name: publish
 
 on:
-  push:
-    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
-    
+  workflow_run:
+    workflows: ["release"]
+    types: [completed]
+
+concurrency:
+  group: lib-ordrsp-publish
+  cancel-in-progress: false
+
 permissions:
   contents: read
-
+  
 jobs:
   release-build:
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -28,10 +37,11 @@ jobs:
 
       - name: Build release distributions
         run: |
-          pip install poetry
-          poetry self add poetry-bumpversion
-          VERSION=${GITHUB_REF:11}
-          poetry version "$VERSION"
+          pip install poetry bump-my-version
+          git fetch --tags
+          VERSION="$(git describe --tags --abbrev=0 | sed 's/^v//')"
+          echo "Building lib-invoice version $VERSION"
+          git checkout "v$VERSION"
           poetry build
 
       - name: Upload distributions
@@ -48,16 +58,9 @@ jobs:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write
 
-    # Dedicated environments with protections for publishing are strongly recommended.
-    # For more information, see: https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#deployment-protection-rules
     environment:
       name: pypi
-      # OPTIONAL: uncomment and update to include your PyPI project URL in the deployment status:
-      # url: https://pypi.org/p/YOURPROJECT
-      #
-      # ALTERNATIVE: if your GitHub Release name is the PyPI project version string
-      # ALTERNATIVE: exactly, uncomment the following line instead:
-      url: https://pypi.org/project/lib-invoice/${{ github.event.release.name }}
+      url: https://pypi.org/project/lib-ordrsp/
 
     steps:
       - name: Retrieve release distributions
