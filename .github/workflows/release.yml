@@ -1,29 +1,68 @@
 name: release
 
 on:
-  push:
-    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+concurrency:
+  group: lib-invoice-version-bump-main
+  cancel-in-progress: false
 
 permissions:
   contents: write
 
 jobs:
   build:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - run: pip install poetry
-      - run: poetry self add poetry-bumpversion
+      - run: pip install poetry bump-my-version
       - run: |
-          VERSION=${GITHUB_REF:11}
-          echo version=$VERSION >> $GITHUB_ENV
-      - run: poetry version ${{ env.version }}
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+
+      - name: Determine bump type
+        id: bump_type
+        run: |
+          LABELS='${{ toJson(github.event.pull_request.labels.*.name) }}'
+          if echo "$LABELS" | grep -q "patch"; then
+            echo "level=patch" >> "$GITHUB_OUTPUT"
+          elif echo "$LABELS" | grep -q "major"; then
+            echo "level=major" >> "$GITHUB_OUTPUT"
+          elif echo "$LABELS" | grep -q "minor"; then
+            echo "level=minor" >> "$GITHUB_OUTPUT"
+          else
+            echo "no version bump label found"
+            exit 1
+          fi
+
+      - name: Bump version
+        id: bump
+        run: |
+          bump-my-version bump ${{ steps.bump_type.outputs.level }} --commit --tag
+          VERSION="$(bump-my-version show current_version)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Push commit + tags to main
+        run: |
+          git push origin HEAD:main --follow-tags
+
       - run: poetry build
-      - uses: softprops/action-gh-release@v2
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ steps.bump.outputs.version }}
+          name: v${{ steps.bump.outputs.version }}
           files: |
             dist/*.whl
             dist/*.tar.gz
+
