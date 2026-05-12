@@ -5,6 +5,60 @@ from lib_utilys import clean_special_characters, read_json
 
 logger = logging.getLogger(__name__)
 
+def rename_detail_columns(df):
+    rename_map = {
+        'EAN': 'EAN_UPC',
+        'Material_number_vendor': 'VEND_MAT',
+        'Material_number': 'MATERIAL',
+        'Position_number': 'PO_ITEM',
+        'Delivery_date': 'DELIV_DATE',
+        'Discount': 'DISCOUNT',
+        'Quantity': 'QUANTITY',
+        'Material_description_vendor': 'SHORT_TEXT',
+        'Price_unit': 'PRICE_UNIT',
+        'Product_line_price': 'NET_VALUE',
+        'Product_net_price': 'NET_PRICE',
+        'Product_price': 'GROS_PRICE',
+        'Purchase_order_line': 'PO_NUMBER',
+        'Purchase_order_line_date': 'PO_DATE',
+        'Unit': 'UNIT',
+        'Vendor_position_number': 'VEND_PO_ITEM',
+    }
+    return df.rename(columns=rename_map)
+
+def rename_header_columns(df):
+    rename_map = {
+        'Creditor_number': 'CREDITOR',
+        'Partner_name': 'CRED_NAME',
+        'Partner_street': 'CRED_STREET',
+        'Partner_city': 'CRED_CITY',
+        'Partner_postal_code': 'CRED_POSTAL',
+        'Partner_country': 'CRED_CNTRY',
+        'Partner_tax_number': 'CRED_TAX_NUM',
+        'IBAN': 'CRED_IBAN',
+        'BIC': 'CRED_BIC',
+        'Creditor_international_location_number': 'CRED_ILN',
+        'Invoice_number': 'INVOICE',
+        'Invoice_date': 'INVO_DATE',
+        'Debtor_number': 'DEBTOR',
+        'Debtor_name': 'DEB_NAME',
+        'Debtor_street': 'DEB_STREET',
+        'Debtor_city': 'DEB_CITY',
+        'Debtor_postal_code': 'DEB_POSTAL',
+        'Purchase_order': 'PO_NUMBER',
+        'Purchase_order_date': 'PO_DATE',
+        'Vendor_order': 'CRED_ORDER',
+        'Net_value': 'NET_VALUE',
+        'Invoice_value': 'INVO_VALUE',
+        'Total_tax' : 'TAX_VALUE',
+        'Tax_percent': 'TAX_PERCENT',
+        'Delivery_date': 'DELIV_DATE',
+        'Term_discount': 'TERM_DISC',
+        'Payment_term_with_discount_days': 'PAYM_TERM_DISC',
+    }
+    return df.rename(columns=rename_map)
+
+
 class Invoice:
     def __init__(self, uid: str, adress: str, message: str, business: str, subject: str, text: str, pdf: bytes):
         self.uid = uid
