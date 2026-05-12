@@ -18,3 +18,20 @@ packages = [{include = "lib_invoice", from = "src"}]
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.bumpversion]
+allow_dirty = false
+commit = false
+tag = false
+
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+
+message = "Bump version: {current_version} → {new_version}"
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} → {new_version}"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = "version = \"{current_version}\""
+replace = "version = \"{new_version}\""
