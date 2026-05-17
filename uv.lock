@@ -1,0 +1,23 @@
+version = 1
+revision = 3
+requires-python = ">=3.10"
+
+[[package]]
+name = "lib-invoice"
+version = "0.1.11"
+source = { editable = "." }
+dependencies = [
+    { name = "lib-utilys" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "lib-utilys", specifier = ">=0.1.3,<0.2.0" }]
+
+[[package]]
+name = "lib-utilys"
+version = "0.1.8"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f7/16/7c4e545127d4325c22149624f20c1c23df2c96163ec0253fea53ce4020ea/lib_utilys-0.1.8.tar.gz", hash = "sha256:04bb091e10878b53e7d10ba2f1d9ed49e99e5404daa1f794ee82fb0bdbd12ae3", size = 1439, upload-time = "2025-08-22T07:22:54.288Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/77/7f/9f762aade98ee5a2ccced3d4266ae5f5f8695f793e332d1e1eb213698b91/lib_utilys-0.1.8-py3-none-any.whl", hash = "sha256:37d8a6e58b99843b962ad5504bd9daa93b3a013462209520609cb75d8770c807", size = 2087, upload-time = "2025-08-22T07:22:53.311Z" },
+]

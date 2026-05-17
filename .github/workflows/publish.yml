@@ -14,7 +14,7 @@ on:
     types: [completed]
 
 concurrency:
-  group: lib-ordrsp-publish
+  group: lib-invoice-publish
   cancel-in-progress: false
 
 permissions:
@@ -60,7 +60,7 @@ jobs:
 
     environment:
       name: pypi
-      url: https://pypi.org/project/lib-ordrsp/
+      url: https://pypi.org/project/lib-invoice/
 
     steps:
       - name: Retrieve release distributions
