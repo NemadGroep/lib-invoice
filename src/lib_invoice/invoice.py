@@ -88,6 +88,7 @@ def prop_po_number_over_rows(df_header: pd.DataFrame, df_details: pd.DataFrame):
         prev_po_number = po_number_line
         if pd.isna(po_number_line):
             raise MissingValueError(f"PO_NUMBER is missing for line {idx} and cannot be propogated from header or previous lines.")
+    df_details['PO_NUMBER'] = pd.to_numeric(df_details['PO_NUMBER'], errors='raise').astype('int64')
     return df_details
 
 def add_time_keys(df: pd.DataFrame):
@@ -166,9 +167,10 @@ def configure_crme(df_header: pd.DataFrame, df_details: pd.DataFrame):
     """Configures the CRME type of invoice."""
     df_header['INVO_VALUE'] = df_header['INVO_VALUE'].astype(str).str.replace('-', '')
     df_header['NET_VALUE'] = df_header['NET_VALUE'].astype(str).str.replace('-', '')
-    df_header['TOTAL_TAX'] = df_header['TOTAL_TAX'].astype(str).str.replace('-', '')
+    df_header['TAX_VALUE'] = df_header['TAX_VALUE'].astype(str).str.replace('-', '')
     if not df_details.empty:
-        df_details[0]['Quantity'] = str(df_details[0]['Quantity']).replace('-', '')
+        df_details['QUANTITY'] = df_details['QUANTITY'].astype(str).str.replace('-', '', regex=False)
+    return df_header, df_details
 
 def populate_header(df_header: pd.DataFrame, root: ET.Element):
     """Replaces [KEY] placeholders in the STARTSEG subtree with header values."""
@@ -193,6 +195,7 @@ def populate_details(df_details: pd.DataFrame, root: ET.Element, node: ET.Elemen
                 if pd.notnull(value):
                     elem.text = str(value)
         root.append(detail_line)
+
 
 def remove_placeholders(root: ET.Element):
     """Removes elements whose text is still a [PLACEHOLDER]."""
