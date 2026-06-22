@@ -64,11 +64,11 @@ def rename_header_columns(df: pd.DataFrame):
 
 def check_type(df: pd.DataFrame):
     """Checks the type of the invoice."""
-    if df['NET_VALUE'].iloc[0] == 0:
+    if df['INVO_VALUE'].iloc[0] == 0:
         df['TYPE'] = 'NULL'
-    elif df['NET_VALUE'].iloc[0] < 0:
+    elif df['INVO_VALUE'].iloc[0] < 0:
         df['TYPE'] = 'CRME'
-    elif df['NET_VALUE'].iloc[0] > 0:
+    elif df['INVO_VALUE'].iloc[0] > 0:
         df['TYPE'] = 'INVO'
     return df
 
