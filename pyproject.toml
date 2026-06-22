@@ -1,6 +1,6 @@
 [project]
 name = "lib-invoice"
-version = "0.1.12"
+version = "0.1.13"
 description = ""
 authors = [
     {name = "Nathan Blum",email = "n.blum@student.tudelft.nl"}
